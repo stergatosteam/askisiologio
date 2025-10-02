@@ -5,33 +5,17 @@ import { usePlan } from '@/store/usePlan';
 const TIME_PRESETS: { label: string; value: number }[] = [
   { label: '20s', value: 20 },
   { label: '30s', value: 30 },
-  { label: '40s', value: 40 },
   { label: '45s', value: 45 },
   { label: '1:00', value: 60 },
   { label: '1:30', value: 90 },
   { label: '2:00', value: 120 },
+  { label: '2:30', value: 150 },
   { label: '3:00', value: 180 },
+  { label: '3:30', value: 210 },
+  { label: '4:00', value: 240 },
+  { label: '4:30', value: 270 },
+  { label: '5:00', value: 300 },
 ];
-
-function toTime(value?: number) {
-  if (!value || value <= 0) return '';
-  const m = Math.floor(value / 60);
-  const s = value % 60;
-  return m > 0 ? `${m}:${s.toString().padStart(2, '0')}` : `${s}`;
-}
-function parseTime(input: string) {
-  const trimmed = (input || '').trim();
-  if (!trimmed) return undefined;
-  // καθαρά δευτερόλεπτα
-  if (/^\d+$/.test(trimmed)) return Math.max(0, parseInt(trimmed, 10));
-  // mm:ss
-  const m = trimmed.split(':');
-  if (m.length !== 2) return undefined;
-  const mm = parseInt(m[0] || '0', 10);
-  const ss = parseInt(m[1] || '0', 10);
-  if (Number.isNaN(mm) || Number.isNaN(ss)) return undefined;
-  return Math.max(0, mm * 60 + ss);
-}
 
 export default function ExerciseList({
   dayId,
@@ -61,9 +45,7 @@ export default function ExerciseList({
   return (
     <div className="space-y-4">
       {exercises.map((ex) => {
-        const timeVal = toTime(ex.timeSec);
-        const selectedPresetValue =
-          TIME_PRESETS.find((p) => p.value === (ex.timeSec ?? -1))?.value ?? 'custom';
+        const selected = TIME_PRESETS.find((p) => p.value === ex.timeSec)?.value ?? '';
 
         return (
           <div key={ex.id} className="p-3 border rounded-md flex flex-col gap-2 bg-white text-black">
@@ -99,42 +81,31 @@ export default function ExerciseList({
               />
             </label>
 
-            {/* ΧΡΟΝΟΣ: dropdown presets + προσαρμοσμένο */}
+            {/* ΧΡΟΝΟΣ: μόνο dropdown (έως 5:00) */}
             <div className="space-y-1">
               <span className="text-xs text-brand-gray-dark">Χρόνος</span>
-              <div className="flex gap-2">
-                <select
-                  className="w-1/2 rounded-md border border-brand-gray-light px-2 py-2"
-                  value={selectedPresetValue as any}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    if (val === 'custom') {
-                      // Μένουμε ως έχει, ο χρήστης μπορεί να συμπληρώσει κάτω το custom πεδίο
-                      return;
-                    }
-                    const num = Number(val);
-                    if (!Number.isNaN(num)) {
-                      update(ex.id, { timeSec: num });
-                    }
-                  }}
-                >
-                  <option value="custom">— Επιλογή χρόνου —</option>
-                  {TIME_PRESETS.map((p) => (
-                    <option key={p.value} value={p.value}>
-                      {p.label}
-                    </option>
-                  ))}
-                </select>
-
-                <input
-                  className="flex-1 rounded-md border border-brand-gray-light px-2 py-2"
-                  placeholder="mm:ss ή δευτ. (π.χ. 45 ή 1:00)"
-                  value={timeVal}
-                  onChange={(e) => update(ex.id, { timeSec: parseTime(e.target.value) })}
-                />
-              </div>
+              <select
+                className="w-full rounded-md border border-brand-gray-light px-2 py-2"
+                value={selected as any}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  if (v === '') {
+                    update(ex.id, { timeSec: undefined });
+                    return;
+                  }
+                  const num = Number(v);
+                  if (!Number.isNaN(num)) update(ex.id, { timeSec: num });
+                }}
+              >
+                <option value="">— Επιλογή χρόνου —</option>
+                {TIME_PRESETS.map((p) => (
+                  <option key={p.value} value={p.value}>
+                    {p.label}
+                  </option>
+                ))}
+              </select>
               <p className="text-[11px] text-brand-gray-dark">
-                Διάλεξε από τη λίστα ή γράψε δικό σου (mm:ss ή δευτερόλεπτα).
+                Επιλογές: 20s έως 5:00 (χωρίς χειροκίνητη εισαγωγή).
               </p>
             </div>
 
