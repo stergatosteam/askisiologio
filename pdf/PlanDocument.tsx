@@ -6,19 +6,30 @@ import { ensureFontsRegistered } from './fonts'
 ensureFontsRegistered();
 
 const styles = StyleSheet.create({
-  page: { padding: 20, fontSize: 11, fontFamily: 'NotoSans',backgroundColor: '#ffffff', },
-  headerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
+  // Λευκό φόντο σε όλη τη σελίδα
+  page: { padding: 24, fontSize: 11, fontFamily: 'NotoSans', backgroundColor: '#ffffff' },
+
+  // Γραμμή λογότυπου/brand (προαιρετικά – διατήρησα όπως πριν)
+  headerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
   brand: { marginLeft: 12 },
-  headerBox: {backgroundColor: '#f2f2f2', borderRadius: 10, padding: 12, marginBottom: 20, },
   logo: { width: 54, height: 54 },
-  day: { marginBottom: 12, borderBottom: 1, paddingBottom: 8 },
+
+  // 👉 Το νέο γκρι κουτί χωρίς περίγραμμα
+  metaBox: {
+    backgroundColor: '#f2f2f2',   // ανοιχτό γκρι
+    borderRadius: 10,              // στρογγυλεμένες γωνίες
+    padding: 10,                   // εσωτερικό κενό
+    marginBottom: 14,              // απόσταση από τα επόμενα
+  },
+  metaLine: { fontSize: 12, color: '#000000', marginBottom: 4 },
+
+  day: { marginBottom: 12, borderBottom: 1, paddingBottom: 8, borderColor: '#e5e7eb' },
   row: { flexDirection: 'row', marginBottom: 4 },
   cellHeader: { fontWeight: 'bold' },
-  headerText: { fontSize: 12, color: '#000000', marginBottom: 4, },
   link: { color: '#1D4ED8', textDecoration: 'underline' },
 });
 
-const colW = ['28%', '10%', '12%', '12%', '15%', '23%'];
+const colW = ['28%', '10%', '12%', '12%', '15%', '23%']; // Άσκηση, Σετ, Επαναλ., Χρόνος, Κιλά, Σημειώσεις
 
 const Cell = ({ children, w }: { children: any; w: string }) => (
   <Text style={{ width: w }}>{children}</Text>
@@ -50,62 +61,25 @@ function fmtKg(e: Exercise) {
   return `${e.weightKg} kg (${mode})`;
 }
 
-interface Props {trainer: string; client: string; date: string; goal: string; 
-}
-
 export default function PlanDocument({ plan }: { plan: Plan }) {
+  // Τραβάμε τα meta από το plan
+  const trainer = plan.meta.coachName || '';
+  const client = plan.meta.clientName || '';
+  const date = plan.meta.startDate || '';
+  const goal = plan.meta.goal || '';
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        <View style={styles.headerBox}>
-          <Text style={styles.headerText}>Trainer: {trainer}</Text>
-          <Text style={styles.headerText}>Client: {client}</Text>
-          <Text style={styles.headerText}>Date: {date}</Text>
-          <Text style={styles.headerText}>Goal: {goal}</Text>
-        </View>
+        {/* (Προαιρετικό) Λογότυπο + Brand */}
         <View style={styles.headerRow}>
           <Image src="/logo-stergatos.png" style={styles.logo} />
           <View style={styles.brand}>
             <Text style={{ fontSize: 14, fontWeight: 'bold' }}>STERGATOS TEAM</Text>
-            <Text>{plan.meta.clientName} {plan.meta.goal ? `– ${plan.meta.goal}` : ''}</Text>
-            {plan.meta.coachName ? <Text>{`Coach: ${plan.meta.coachName}`}</Text> : null}
+            <Text>{client} {goal ? `– ${goal}` : ''}</Text>
+            {trainer ? <Text>{`Coach: ${trainer}`}</Text> : null}
             {plan.meta.link ? (
-              <Text>Περισσότερα: <Link src={plan.meta.link.startsWith('http') ? plan.meta.link : `https://${plan.meta.link}`} style={styles.link}>{plan.meta.link}</Link></Text>
-            ) : null}
-          </View>
-        </View>
-
-        {plan.days.map((d, i) => (
-          <View key={d.id} style={styles.day}>
-            <Text style={{ fontSize: 12, marginBottom: 4, fontWeight: 'bold' }}>{`${i + 1}. ${d.name}`}</Text>
-
-            <View style={{ ...styles.row, marginBottom: 6 }}>
-              <Text style={[styles.cellHeader, { width: colW[0] }]}>Άσκηση</Text>
-              <Text style={[styles.cellHeader, { width: colW[1] }]}>Σετ</Text>
-              <Text style={[styles.cellHeader, { width: colW[2] }]}>Επαναλ.</Text>
-              <Text style={[styles.cellHeader, { width: colW[3] }]}>Χρόνος</Text>
-              <Text style={[styles.cellHeader, { width: colW[4] }]}>Κιλά</Text>
-              <Text style={[styles.cellHeader, { width: colW[5] }]}>Σημειώσεις</Text>
-            </View>
-
-            {d.sections.map((s) => (
-              <View key={s.title} style={{ marginBottom: 6 }}>
-                <Text style={{ fontWeight: 'bold', marginBottom: 2 }}>{s.title}</Text>
-                {s.exercises.map((e) => (
-                  <View key={e.id} style={styles.row}>
-                    <Cell w={colW[0]}>{e.name}</Cell>
-                    <Cell w={colW[1]}>{e.sets ?? ''}</Cell>
-                    <Cell w={colW[2]}>{e.reps ?? ''}</Cell>
-                    <Cell w={colW[3]}>{fmtTime(e)}</Cell>
-                    <Cell w={colW[4]}>{fmtKg(e)}</Cell>
-                    <Text style={{ width: colW[5] }}><Linkify text={e.notes ?? ''} /></Text>
-                  </View>
-                ))}
-              </View>
-            ))}
-          </View>
-        ))}
-      </Page>
-    </Document>
-  )
-}
+              <Text>
+                Περισσότερα:{' '}
+                <Link
+                  src={plan.meta.link.startsWith('http') ? plan.meta.link : `https://${plan.meta.link}`}
