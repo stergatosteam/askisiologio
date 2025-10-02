@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { --bg: #0b0b0b; }
+body { background: var(--bg); color: white; }
+.container { @apply mx-auto max-w-6xl p-6; }
+.card { @apply rounded-xl bg-white text-black shadow-sm border border-brand-gray-light; }
+.btn { @apply inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium border; }
+.btn-primary { @apply bg-brand-yellow text-brand-black border-brand-yellow; }
+.btn-secondary { @apply bg-brand-black text-white border-brand-black; }
+.badge-muted { @apply text-brand-gray-dark; }
+input, textarea, select { @apply rounded-md border border-brand-gray-light px-2 py-2; }
