@@ -17,6 +17,9 @@ const TIME_PRESETS: { label: string; value: number }[] = [
   { label: '5:00', value: 300 },
 ];
 
+const SET_PRESETS: number[] = Array.from({ length: 11 }, (_, i) => i); // 0–10
+const REP_PRESETS: (string | number)[] = ['-', ...Array.from({ length: 50 }, (_, i) => i + 1), 'MAX'];
+
 export default function ExerciseList({
   dayId,
   sectionIndex,
@@ -45,10 +48,15 @@ export default function ExerciseList({
   return (
     <div className="space-y-4">
       {exercises.map((ex) => {
-        const selected = TIME_PRESETS.find((p) => p.value === ex.timeSec)?.value ?? '';
+        const selectedTime = TIME_PRESETS.find((p) => p.value === ex.timeSec)?.value ?? '';
+        const selectedSets = ex.sets ?? '';
+        const selectedReps = ex.reps ?? '';
 
         return (
-          <div key={ex.id} className="p-3 border rounded-md flex flex-col gap-2 bg-white text-black">
+          <div
+            key={ex.id}
+            className="p-3 border rounded-md flex flex-col gap-2 bg-white text-black"
+          >
             <label className="space-y-1">
               <span className="text-xs text-brand-gray-dark">Όνομα άσκησης</span>
               <input
@@ -59,34 +67,55 @@ export default function ExerciseList({
               />
             </label>
 
+            {/* Σετ με dropdown */}
             <label className="space-y-1">
               <span className="text-xs text-brand-gray-dark">Σετ</span>
-              <input
-                className="w-full"
-                type="number"
-                min={0}
-                value={ex.sets ?? ''}
-                onChange={(e) => update(ex.id, { sets: Number(e.target.value) })}
-                placeholder="Σετ"
-              />
+              <select
+                className="w-full rounded-md border border-brand-gray-light px-2 py-2"
+                value={selectedSets}
+                onChange={(e) => {
+                  const num = Number(e.target.value);
+                  update(ex.id, { sets: Number.isNaN(num) ? undefined : num });
+                }}
+              >
+                <option value="">— Επιλογή —</option>
+                {SET_PRESETS.map((n) => (
+                  <option key={n} value={n}>
+                    {n}
+                  </option>
+                ))}
+              </select>
             </label>
 
+            {/* Επαναλήψεις με dropdown */}
             <label className="space-y-1">
               <span className="text-xs text-brand-gray-dark">Επαναλήψεις</span>
-              <input
-                className="w-full"
-                value={ex.reps || ''}
-                onChange={(e) => update(ex.id, { reps: e.target.value })}
-                placeholder="π.χ. 8-10"
-              />
+              <select
+                className="w-full rounded-md border border-brand-gray-light px-2 py-2"
+                value={selectedReps}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === '-') {
+                    update(ex.id, { reps: '' });
+                  } else {
+                    update(ex.id, { reps: val });
+                  }
+                }}
+              >
+                {REP_PRESETS.map((r) => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))}
+              </select>
             </label>
 
-            {/* ΧΡΟΝΟΣ: μόνο dropdown (έως 5:00) */}
+            {/* Χρόνος */}
             <div className="space-y-1">
               <span className="text-xs text-brand-gray-dark">Χρόνος</span>
               <select
                 className="w-full rounded-md border border-brand-gray-light px-2 py-2"
-                value={selected as any}
+                value={selectedTime as any}
                 onChange={(e) => {
                   const v = e.target.value;
                   if (v === '') {
@@ -104,9 +133,6 @@ export default function ExerciseList({
                   </option>
                 ))}
               </select>
-              <p className="text-[11px] text-brand-gray-dark">
-                Επιλογές: 20s έως 5:00 (χωρίς χειροκίνητη εισαγωγή).
-              </p>
             </div>
 
             <div className="flex gap-2">
@@ -116,11 +142,12 @@ export default function ExerciseList({
                   className="w-full"
                   type="number"
                   min={0}
-                  step="0.5"
+                  step={0.5}
                   value={ex.weightKg ?? ''}
                   onChange={(e) =>
                     update(ex.id, {
-                      weightKg: e.target.value === '' ? undefined : Number(e.target.value),
+                      weightKg:
+                        e.target.value === '' ? undefined : Number(e.target.value),
                     })
                   }
                   placeholder="Kg"
@@ -131,7 +158,9 @@ export default function ExerciseList({
                 <select
                   className="w-full"
                   value={ex.weightMode || 'total'}
-                  onChange={(e) => update(ex.id, { weightMode: e.target.value as WeightMode })}
+                  onChange={(e) =>
+                    update(ex.id, { weightMode: e.target.value as WeightMode })
+                  }
                 >
                   <option value="total">Συνολικά</option>
                   <option value="per-side">Ανά πλευρά</option>
