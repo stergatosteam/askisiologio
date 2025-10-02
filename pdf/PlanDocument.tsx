@@ -8,7 +8,7 @@ ensureFontsRegistered();
 const styles = StyleSheet.create({
   page: { padding: 24, fontSize: 11, fontFamily: 'NotoSans', backgroundColor: '#ffffff' },
 
-  // Logo / brand row
+  // Header (logo + brand only)
   headerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
   brand: { marginLeft: 12 },
   logo: { width: 54, height: 54 },
@@ -29,15 +29,18 @@ const styles = StyleSheet.create({
   },
   dayTitleText: { fontSize: 12, fontWeight: 'bold', color: '#000000' },
 
-  // Warmup section
-  warmupBox: {
-    backgroundColor: '#FEF9C3',
-    borderRadius: 6,
-    paddingVertical: 4,
+  // Section label badges (Warm up / Main / Cool-down)
+  sectionLabel: {
+    backgroundColor: '#FEF9C3', // yellow
+    color: '#000000',
+    fontWeight: 'bold',
+    fontSize: 11,
+    borderRadius: 4,
+    paddingVertical: 2,
     paddingHorizontal: 6,
-    marginBottom: 6,
+    alignSelf: 'flex-start', // wrap just the text
+    marginBottom: 4,
   },
-  warmupText: { fontSize: 11, color: '#000000', fontWeight: 'bold' },
 
   // Table headers
   tableHeaderRow: {
@@ -74,7 +77,7 @@ const styles = StyleSheet.create({
   link: { color: '#1D4ED8', textDecoration: 'underline' },
 });
 
-const colW = ['28%', '10%', '12%', '12%', '15%', '23%'];
+const colW = ['28%', '10%', '12%', '12%', '15%', '23%']; // Exercise, Sets, Reps, Time, Kg, Notes
 
 const Cell = ({ children, w }: { children: React.ReactNode; w: string }) => (
   <Text style={{ width: w }}>{children}</Text>
@@ -119,7 +122,7 @@ export default function PlanDocument({ plan }: { plan: Plan }) {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        {/* Logo + brand (ΜΟΝΟ ο τίτλος – χωρίς client/coach/goal/link) */}
+        {/* Logo + brand (no client/coach/goal/link here) */}
         <View style={styles.headerRow}>
           <Image src="/logo-stergatos.png" style={styles.logo} />
           <View style={styles.brand}>
@@ -127,7 +130,7 @@ export default function PlanDocument({ plan }: { plan: Plan }) {
           </View>
         </View>
 
-        {/* Meta box με όλα τα στοιχεία */}
+        {/* Meta box with details */}
         <View style={styles.metaBox}>
           <Text style={styles.metaLine}>Trainer: {trainer}</Text>
           <Text style={styles.metaLine}>Client: {client}</Text>
@@ -155,17 +158,20 @@ export default function PlanDocument({ plan }: { plan: Plan }) {
 
             {/* Sections */}
             {d.sections.map((s) => {
-              const isWarmup =
-                s.title.toLowerCase().includes('warm') ||
-                s.title.toLowerCase().includes('warm-up') ||
-                s.title.toLowerCase().includes('warm up');
+              const lower = s.title.toLowerCase();
+              const isBadge =
+                lower.includes('warm') ||
+                lower.includes('warm-up') ||
+                lower.includes('warm up') ||
+                lower.includes('main') ||
+                lower.includes('cool') ||
+                lower.includes('cool-down') ||
+                lower.includes('cool down');
 
               return (
                 <View key={s.title} style={{ marginBottom: 6 }}>
-                  {isWarmup ? (
-                    <View style={styles.warmupBox}>
-                      <Text style={styles.warmupText}>{s.title}</Text>
-                    </View>
+                  {isBadge ? (
+                    <Text style={styles.sectionLabel}>{s.title}</Text>
                   ) : (
                     <Text style={{ fontWeight: 'bold', marginBottom: 2 }}>{s.title}</Text>
                   )}
