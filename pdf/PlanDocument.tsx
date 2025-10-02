@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
   exerciseRowEven: {
     flexDirection: 'row',
     marginBottom: 4,
-    backgroundColor: '#f9fafb', // ανοιχτό γκρι
+    backgroundColor: '#f9fafb',
     borderRadius: 4,
     paddingVertical: 2,
     paddingHorizontal: 2,
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
   exerciseRowOdd: {
     flexDirection: 'row',
     marginBottom: 4,
-    backgroundColor: '#ffffff', // λευκό
+    backgroundColor: '#ffffff',
     borderRadius: 4,
     paddingVertical: 2,
     paddingHorizontal: 2,
@@ -119,30 +119,15 @@ export default function PlanDocument({ plan }: { plan: Plan }) {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        {/* Logo + brand */}
+        {/* Logo + brand (ΜΟΝΟ ο τίτλος – χωρίς client/coach/goal/link) */}
         <View style={styles.headerRow}>
           <Image src="/logo-stergatos.png" style={styles.logo} />
           <View style={styles.brand}>
             <Text style={{ fontSize: 14, fontWeight: 'bold' }}>STERGATOS TEAM</Text>
-            <Text>
-              {client} {goal ? `– ${goal}` : ''}
-            </Text>
-            {trainer ? <Text>{`Coach: ${trainer}`}</Text> : null}
-            {plan.meta.link ? (
-              <Text>
-                More:{' '}
-                <Link
-                  src={plan.meta.link.startsWith('http') ? plan.meta.link : `https://${plan.meta.link}`}
-                  style={styles.link}
-                >
-                  {plan.meta.link}
-                </Link>
-              </Text>
-            ) : null}
           </View>
         </View>
 
-        {/* Meta box */}
+        {/* Meta box με όλα τα στοιχεία */}
         <View style={styles.metaBox}>
           <Text style={styles.metaLine}>Trainer: {trainer}</Text>
           <Text style={styles.metaLine}>Client: {client}</Text>
@@ -186,7 +171,10 @@ export default function PlanDocument({ plan }: { plan: Plan }) {
                   )}
 
                   {s.exercises.map((e, idx) => (
-                    <View key={e.id} style={idx % 2 === 0 ? styles.exerciseRowEven : styles.exerciseRowOdd}>
+                    <View
+                      key={e.id}
+                      style={idx % 2 === 0 ? styles.exerciseRowEven : styles.exerciseRowOdd}
+                    >
                       <Cell w={colW[0]}>{e.name}</Cell>
                       <Cell w={colW[1]}>{e.sets ?? ''}</Cell>
                       <Cell w={colW[2]}>{e.reps ?? ''}</Cell>
