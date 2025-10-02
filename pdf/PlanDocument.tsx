@@ -8,16 +8,16 @@ ensureFontsRegistered();
 const styles = StyleSheet.create({
   page: { padding: 24, fontSize: 11, fontFamily: 'NotoSans', backgroundColor: '#ffffff' },
 
-  // Logo / brand row (unchanged)
+  // Logo / brand row
   headerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
   brand: { marginLeft: 12 },
   logo: { width: 54, height: 54 },
 
-  // Meta box (trainer/client/date/goal): light grey, rounded, no border
+  // Meta box (trainer/client/date/goal)
   metaBox: { backgroundColor: '#f2f2f2', borderRadius: 10, padding: 10, marginBottom: 14 },
   metaLine: { fontSize: 12, color: '#000000', marginBottom: 4 },
 
-  // Day title: light blue with dark blue border, bold black text
+  // Day title box
   dayTitleBox: {
     backgroundColor: '#E0F2FE',
     border: 1,
@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
   },
   dayTitleText: { fontSize: 12, fontWeight: 'bold', color: '#000000' },
 
-  // Warm-up section header: yellow box, black text
+  // Warmup section
   warmupBox: {
     backgroundColor: '#FEF9C3',
     borderRadius: 6,
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
   },
   warmupText: { fontSize: 11, color: '#000000', fontWeight: 'bold' },
 
-  // Table header row: black background, white bold text
+  // Table headers
   tableHeaderRow: {
     flexDirection: 'row',
     marginBottom: 6,
@@ -50,14 +50,31 @@ const styles = StyleSheet.create({
   },
   tableHeaderCell: { fontWeight: 'bold', color: '#ffffff' },
 
-  // Day block container + generic row
+  // Day block container
   day: { marginBottom: 12, borderBottom: 1, borderColor: '#e5e7eb', paddingBottom: 8 },
-  row: { flexDirection: 'row', marginBottom: 4 },
+
+  // Exercise rows with zebra striping
+  exerciseRowEven: {
+    flexDirection: 'row',
+    marginBottom: 4,
+    backgroundColor: '#f9fafb', // ανοιχτό γκρι
+    borderRadius: 4,
+    paddingVertical: 2,
+    paddingHorizontal: 2,
+  },
+  exerciseRowOdd: {
+    flexDirection: 'row',
+    marginBottom: 4,
+    backgroundColor: '#ffffff', // λευκό
+    borderRadius: 4,
+    paddingVertical: 2,
+    paddingHorizontal: 2,
+  },
 
   link: { color: '#1D4ED8', textDecoration: 'underline' },
 });
 
-const colW = ['28%', '10%', '12%', '12%', '15%', '23%']; // Exercise, Sets, Reps, Time, Kg, Notes
+const colW = ['28%', '10%', '12%', '12%', '15%', '23%'];
 
 const Cell = ({ children, w }: { children: React.ReactNode; w: string }) => (
   <Text style={{ width: w }}>{children}</Text>
@@ -136,12 +153,12 @@ export default function PlanDocument({ plan }: { plan: Plan }) {
         {/* Days */}
         {plan.days.map((d, i) => (
           <View key={d.id} style={styles.day}>
-            {/* Day title styled */}
+            {/* Day title */}
             <View style={styles.dayTitleBox}>
               <Text style={styles.dayTitleText}>{`${i + 1}. ${d.name}`}</Text>
             </View>
 
-            {/* Table header */}
+            {/* Table headers */}
             <View style={styles.tableHeaderRow}>
               <Text style={[styles.tableHeaderCell, { width: colW[0] }]}>Άσκηση</Text>
               <Text style={[styles.tableHeaderCell, { width: colW[1] }]}>Σετ</Text>
@@ -168,8 +185,8 @@ export default function PlanDocument({ plan }: { plan: Plan }) {
                     <Text style={{ fontWeight: 'bold', marginBottom: 2 }}>{s.title}</Text>
                   )}
 
-                  {s.exercises.map((e) => (
-                    <View key={e.id} style={styles.row}>
+                  {s.exercises.map((e, idx) => (
+                    <View key={e.id} style={idx % 2 === 0 ? styles.exerciseRowEven : styles.exerciseRowOdd}>
                       <Cell w={colW[0]}>{e.name}</Cell>
                       <Cell w={colW[1]}>{e.sets ?? ''}</Cell>
                       <Cell w={colW[2]}>{e.reps ?? ''}</Cell>
