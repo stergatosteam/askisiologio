@@ -7,18 +7,57 @@ ensureFontsRegistered();
 
 const styles = StyleSheet.create({
   page: { padding: 24, fontSize: 11, fontFamily: 'NotoSans', backgroundColor: '#ffffff' },
+
+  // Logo / brand row (unchanged)
   headerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
   brand: { marginLeft: 12 },
   logo: { width: 54, height: 54 },
+
+  // Meta box (trainer/client/date/goal): light grey, rounded, no border
   metaBox: { backgroundColor: '#f2f2f2', borderRadius: 10, padding: 10, marginBottom: 14 },
   metaLine: { fontSize: 12, color: '#000000', marginBottom: 4 },
+
+  // Day title: light blue with dark blue border, bold black text
+  dayTitleBox: {
+    backgroundColor: '#E0F2FE',
+    border: 1,
+    borderColor: '#1E3A8A',
+    borderRadius: 6,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    marginBottom: 8,
+  },
+  dayTitleText: { fontSize: 12, fontWeight: 'bold', color: '#000000' },
+
+  // Warm-up section header: yellow box, black text
+  warmupBox: {
+    backgroundColor: '#FEF9C3',
+    borderRadius: 6,
+    paddingVertical: 4,
+    paddingHorizontal: 6,
+    marginBottom: 6,
+  },
+  warmupText: { fontSize: 11, color: '#000000', fontWeight: 'bold' },
+
+  // Table header row: black background, white bold text
+  tableHeaderRow: {
+    flexDirection: 'row',
+    marginBottom: 6,
+    backgroundColor: '#000000',
+    borderRadius: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 2,
+  },
+  tableHeaderCell: { fontWeight: 'bold', color: '#ffffff' },
+
+  // Day block container + generic row
   day: { marginBottom: 12, borderBottom: 1, borderColor: '#e5e7eb', paddingBottom: 8 },
   row: { flexDirection: 'row', marginBottom: 4 },
-  cellHeader: { fontWeight: 'bold' },
+
   link: { color: '#1D4ED8', textDecoration: 'underline' },
 });
 
-const colW = ['28%', '10%', '12%', '12%', '15%', '23%'];
+const colW = ['28%', '10%', '12%', '12%', '15%', '23%']; // Exercise, Sets, Reps, Time, Kg, Notes
 
 const Cell = ({ children, w }: { children: React.ReactNode; w: string }) => (
   <Text style={{ width: w }}>{children}</Text>
@@ -32,7 +71,11 @@ const Linkify = ({ text = '' }: { text?: string }) => {
         const isUrl = /^(https?:\/\/|www\.)/i.test(part);
         if (!isUrl) return <Text key={i}>{part}</Text>;
         const href = part.startsWith('http') ? part : `https://${part}`;
-        return <Link key={i} src={href} style={styles.link}>{part}</Link>;
+        return (
+          <Link key={i} src={href} style={styles.link}>
+            {part}
+          </Link>
+        );
       })}
     </Text>
   );
@@ -59,20 +102,30 @@ export default function PlanDocument({ plan }: { plan: Plan }) {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
+        {/* Logo + brand */}
         <View style={styles.headerRow}>
           <Image src="/logo-stergatos.png" style={styles.logo} />
           <View style={styles.brand}>
             <Text style={{ fontSize: 14, fontWeight: 'bold' }}>STERGATOS TEAM</Text>
-            <Text>{client} {goal ? `– ${goal}` : ''}</Text>
+            <Text>
+              {client} {goal ? `– ${goal}` : ''}
+            </Text>
             {trainer ? <Text>{`Coach: ${trainer}`}</Text> : null}
             {plan.meta.link ? (
               <Text>
-                More: <Link src={plan.meta.link.startsWith('http') ? plan.meta.link : `https://${plan.meta.link}`} style={styles.link}>{plan.meta.link}</Link>
+                More:{' '}
+                <Link
+                  src={plan.meta.link.startsWith('http') ? plan.meta.link : `https://${plan.meta.link}`}
+                  style={styles.link}
+                >
+                  {plan.meta.link}
+                </Link>
               </Text>
             ) : null}
           </View>
         </View>
 
+        {/* Meta box */}
         <View style={styles.metaBox}>
           <Text style={styles.metaLine}>Trainer: {trainer}</Text>
           <Text style={styles.metaLine}>Client: {client}</Text>
@@ -80,34 +133,56 @@ export default function PlanDocument({ plan }: { plan: Plan }) {
           <Text style={styles.metaLine}>Goal: {goal}</Text>
         </View>
 
+        {/* Days */}
         {plan.days.map((d, i) => (
           <View key={d.id} style={styles.day}>
-            <Text style={{ fontSize: 12, marginBottom: 4, fontWeight: 'bold' }}>{`${i + 1}. ${d.name}`}</Text>
-
-            <View style={{ ...styles.row, marginBottom: 6 }}>
-              <Text style={[styles.cellHeader, { width: colW[0] }]}>Άσκηση</Text>
-              <Text style={[styles.cellHeader, { width: colW[1] }]}>Σετ</Text>
-              <Text style={[styles.cellHeader, { width: colW[2] }]}>Επαναλ.</Text>
-              <Text style={[styles.cellHeader, { width: colW[3] }]}>Χρόνος</Text>
-              <Text style={[styles.cellHeader, { width: colW[4] }]}>Κιλά</Text>
-              <Text style={[styles.cellHeader, { width: colW[5] }]}>Σημειώσεις</Text>
+            {/* Day title styled */}
+            <View style={styles.dayTitleBox}>
+              <Text style={styles.dayTitleText}>{`${i + 1}. ${d.name}`}</Text>
             </View>
 
-            {d.sections.map((s) => (
-              <View key={s.title} style={{ marginBottom: 6 }}>
-                <Text style={{ fontWeight: 'bold', marginBottom: 2 }}>{s.title}</Text>
-                {s.exercises.map((e) => (
-                  <View key={e.id} style={styles.row}>
-                    <Cell w={colW[0]}>{e.name}</Cell>
-                    <Cell w={colW[1]}>{e.sets ?? ''}</Cell>
-                    <Cell w={colW[2]}>{e.reps ?? ''}</Cell>
-                    <Cell w={colW[3]}>{fmtTime(e)}</Cell>
-                    <Cell w={colW[4]}>{fmtKg(e)}</Cell>
-                    <Text style={{ width: colW[5] }}><Linkify text={e.notes ?? ''} /></Text>
-                  </View>
-                ))}
-              </View>
-            ))}
+            {/* Table header */}
+            <View style={styles.tableHeaderRow}>
+              <Text style={[styles.tableHeaderCell, { width: colW[0] }]}>Άσκηση</Text>
+              <Text style={[styles.tableHeaderCell, { width: colW[1] }]}>Σετ</Text>
+              <Text style={[styles.tableHeaderCell, { width: colW[2] }]}>Επαναλ.</Text>
+              <Text style={[styles.tableHeaderCell, { width: colW[3] }]}>Χρόνος</Text>
+              <Text style={[styles.tableHeaderCell, { width: colW[4] }]}>Κιλά</Text>
+              <Text style={[styles.tableHeaderCell, { width: colW[5] }]}>Σημειώσεις</Text>
+            </View>
+
+            {/* Sections */}
+            {d.sections.map((s) => {
+              const isWarmup =
+                s.title.toLowerCase().includes('warm') ||
+                s.title.toLowerCase().includes('warm-up') ||
+                s.title.toLowerCase().includes('warm up');
+
+              return (
+                <View key={s.title} style={{ marginBottom: 6 }}>
+                  {isWarmup ? (
+                    <View style={styles.warmupBox}>
+                      <Text style={styles.warmupText}>{s.title}</Text>
+                    </View>
+                  ) : (
+                    <Text style={{ fontWeight: 'bold', marginBottom: 2 }}>{s.title}</Text>
+                  )}
+
+                  {s.exercises.map((e) => (
+                    <View key={e.id} style={styles.row}>
+                      <Cell w={colW[0]}>{e.name}</Cell>
+                      <Cell w={colW[1]}>{e.sets ?? ''}</Cell>
+                      <Cell w={colW[2]}>{e.reps ?? ''}</Cell>
+                      <Cell w={colW[3]}>{fmtTime(e)}</Cell>
+                      <Cell w={colW[4]}>{fmtKg(e)}</Cell>
+                      <Text style={{ width: colW[5] }}>
+                        <Linkify text={e.notes ?? ''} />
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              );
+            })}
           </View>
         ))}
       </Page>
