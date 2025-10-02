@@ -11,7 +11,7 @@ const styles = StyleSheet.create({
   brand: { marginLeft: 12 },
   logo: { width: 54, height: 54 },
 
-  // Γκρι κουτί χωρίς border
+  // Light grey meta box with rounded corners, no border
   metaBox: { backgroundColor: '#f2f2f2', borderRadius: 10, padding: 10, marginBottom: 14 },
   metaLine: { fontSize: 12, color: '#000000', marginBottom: 4 },
 
@@ -70,13 +70,11 @@ export default function PlanDocument({ plan }: { plan: Plan }) {
           <Image src="/logo-stergatos.png" style={styles.logo} />
           <View style={styles.brand}>
             <Text style={{ fontSize: 14, fontWeight: 'bold' }}>STERGATOS TEAM</Text>
-            <Text>
-              {client} {goal ? `– ${goal}` : ''}
-            </Text>
+            <Text>{client} {goal ? `– ${goal}` : ''}</Text>
             {trainer ? <Text>{`Coach: ${trainer}`}</Text> : null}
             {plan.meta.link ? (
               <Text>
-                Περισσότερα:{' '}
+                More:{' '}
                 <Link
                   src={plan.meta.link.startsWith('http') ? plan.meta.link : `https://${plan.meta.link}`}
                   style={styles.link}
@@ -88,7 +86,7 @@ export default function PlanDocument({ plan }: { plan: Plan }) {
           </View>
         </View>
 
-        {/* Γκρι κουτί με στρογγυλεμένες γωνίες, ΧΩΡΙΣ περίγραμμα */}
+        {/* Grey rounded meta box, no border */}
         <View style={styles.metaBox}>
           <Text style={styles.metaLine}>Trainer: {trainer}</Text>
           <Text style={styles.metaLine}>Client: {client}</Text>
