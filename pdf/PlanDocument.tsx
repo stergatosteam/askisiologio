@@ -10,11 +10,8 @@ const styles = StyleSheet.create({
   headerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
   brand: { marginLeft: 12 },
   logo: { width: 54, height: 54 },
-
-  // Light grey meta box with rounded corners, no border
   metaBox: { backgroundColor: '#f2f2f2', borderRadius: 10, padding: 10, marginBottom: 14 },
   metaLine: { fontSize: 12, color: '#000000', marginBottom: 4 },
-
   day: { marginBottom: 12, borderBottom: 1, borderColor: '#e5e7eb', paddingBottom: 8 },
   row: { flexDirection: 'row', marginBottom: 4 },
   cellHeader: { fontWeight: 'bold' },
@@ -35,11 +32,7 @@ const Linkify = ({ text = '' }: { text?: string }) => {
         const isUrl = /^(https?:\/\/|www\.)/i.test(part);
         if (!isUrl) return <Text key={i}>{part}</Text>;
         const href = part.startsWith('http') ? part : `https://${part}`;
-        return (
-          <Link key={i} src={href} style={styles.link}>
-            {part}
-          </Link>
-        );
+        return <Link key={i} src={href} style={styles.link}>{part}</Link>;
       })}
     </Text>
   );
@@ -74,19 +67,12 @@ export default function PlanDocument({ plan }: { plan: Plan }) {
             {trainer ? <Text>{`Coach: ${trainer}`}</Text> : null}
             {plan.meta.link ? (
               <Text>
-                More:{' '}
-                <Link
-                  src={plan.meta.link.startsWith('http') ? plan.meta.link : `https://${plan.meta.link}`}
-                  style={styles.link}
-                >
-                  {plan.meta.link}
-                </Link>
+                More: <Link src={plan.meta.link.startsWith('http') ? plan.meta.link : `https://${plan.meta.link}`} style={styles.link}>{plan.meta.link}</Link>
               </Text>
             ) : null}
           </View>
         </View>
 
-        {/* Grey rounded meta box, no border */}
         <View style={styles.metaBox}>
           <Text style={styles.metaLine}>Trainer: {trainer}</Text>
           <Text style={styles.metaLine}>Client: {client}</Text>
@@ -117,9 +103,7 @@ export default function PlanDocument({ plan }: { plan: Plan }) {
                     <Cell w={colW[2]}>{e.reps ?? ''}</Cell>
                     <Cell w={colW[3]}>{fmtTime(e)}</Cell>
                     <Cell w={colW[4]}>{fmtKg(e)}</Cell>
-                    <Text style={{ width: colW[5] }}>
-                      <Linkify text={e.notes ?? ''} />
-                    </Text>
+                    <Text style={{ width: colW[5] }}><Linkify text={e.notes ?? ''} /></Text>
                   </View>
                 ))}
               </View>
