@@ -6,13 +6,15 @@ import { ensureFontsRegistered } from './fonts'
 ensureFontsRegistered();
 
 const styles = StyleSheet.create({
-  page: { padding: 24, fontSize: 11, fontFamily: 'NotoSans' },
+  page: { padding: 20, fontSize: 11, fontFamily: 'NotoSans',backgroundColor: '#ffffff', },
   headerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
   brand: { marginLeft: 12 },
+  headerBox: {backgroundColor: '#f2f2f2', borderRadius: 10, padding: 12, marginBottom: 20, },
   logo: { width: 54, height: 54 },
   day: { marginBottom: 12, borderBottom: 1, paddingBottom: 8 },
   row: { flexDirection: 'row', marginBottom: 4 },
   cellHeader: { fontWeight: 'bold' },
+  headerText: { fontSize: 12, color: '#000000', marginBottom: 4, },
   link: { color: '#1D4ED8', textDecoration: 'underline' },
 });
 
@@ -48,10 +50,19 @@ function fmtKg(e: Exercise) {
   return `${e.weightKg} kg (${mode})`;
 }
 
+interface Props {trainer: string; client: string; date: string; goal: string; 
+}
+
 export default function PlanDocument({ plan }: { plan: Plan }) {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
+        <View style={styles.headerBox}>
+          <Text style={styles.headerText}>Trainer: {trainer}</Text>
+          <Text style={styles.headerText}>Client: {client}</Text>
+          <Text style={styles.headerText}>Date: {date}</Text>
+          <Text style={styles.headerText}>Goal: {goal}</Text>
+        </View>
         <View style={styles.headerRow}>
           <Image src="/logo-stergatos.png" style={styles.logo} />
           <View style={styles.brand}>
